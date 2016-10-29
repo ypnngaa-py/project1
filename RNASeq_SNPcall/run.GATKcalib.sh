@@ -15,5 +15,6 @@
 genomeFasta=/u/home/p/panyang/nobackup-yxing/RNASeq_SNPcall/resource/ucsc.hg19.fasta
 dbsnp=/u/home/p/panyang/nobackup-yxing/RNASeq_SNPcall/resource/dbsnp_138.hg19.vcf
 InputSam=$1
-python rMATS-DVR/bam_calibration.py --bam $InputSam --output GM12787 --genome $genomeFasta --known $dbsnp
+OutPut_Prefix=$2
+python rMATS-DVR/bam_calibration.py --bam $InputSam --output $OutPut_Prefix --genome $genomeFasta --known $dbsnp
 

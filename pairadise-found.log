@@ -1,0 +1,25 @@
+#SNPcalling
+#STAR 2pass
+bash StarAlignmentPrep.sh -i fin_list.txt -o Star.Out.BAM -p P
+#GATK Calib
+qsub run.GATKcalib.sh Star.Out.BAM/ENCSR000AED.1_2_Aligned.out.sam ENCSR000AED.1
+ 1093  qsub run.GATKcalib.sh Star.Out.BAM/ENCSR000AED.2_2_Aligned.out.sam ENCSR000AED.2
+ 1094  qsub run.GATKcalib.sh Star.Out.BAM/ENCSR000AEH.2_2_Aligned.out.sam ENCSR000AEH.2
+ 1095  qsub run.GATKcalib.sh Star.Out.BAM/ENCSR000AEH.1_2_Aligned.out.sam ENCSR000AEH.1
+ 1096  qsub run.GATKcalib.sh Star.Out.BAM/ENCSR000AEF.1_2_Aligned.out.sam ENCSR000AEF.1
+ 1097  qsub run.GATKcalib.sh Star.Out.BAM/ENCSR000AEF.2_2_Aligned.out.sam ENCSR000AEF.2
+
+#personalize genome
+qsub run.rPGApersonalize.sh /u/home/p/panyang/nobackup-yxing/personal_genome/ /u/home/p/panyang/nobackup-yxing/ENCSR000AED_VCF
+(lession: shell script variable defination NO SPACE)
+#STAR index
+qsub run.STARindex.sh /u/home/p/panyang/nobackup-yxing/personal_genome/HAP2/ /u/home/p/panyang/nobackup-yxing/personal_genome/hap2.fa
+#ASAS pipeline
+#1.mapping
+qsub run.rPGAmap.sh /u/home/p/panyang/nobackup-yxing/RNASeq_SNPcall/ENCSR000AED/rep1 /u/home/p/panyang/nobackup-yxing/RNASeq_SNPcall/ENCSR000AED/ENCFF001REJ.fastq.gz /u/home/p/panyang/nobackup-yxing/RNASeq_SNPcall/ENCSR000AED/ENCFF001REK.fastq.gz /u/home/p/panyang/nobackup-yxing/personal_genome/HAP1 /u/home/p/panyang/nobackup-yxing/personal_genome/HAP2 /u/home/p/panyang/nobackup-yxing/ENCSR000AED_VCF/mkphase_phased_SNPs_noc.vcf.gz
+#2.splicing
+qsub run.rPGAasevents.sh ASEvents
+qsub -t 1-1:1 run.rPGAsplicing.sh ASEvents samples.txt
+qsub run.rPGAmerge.sh samples.txt ASASCounts ../ENCSR000AED_VCF/mkphase_phased_SNPs_noc.vcf.gz
+#3.PAIRADISE
+qsub run.PAIRADISE.sh ASASCounts/ASAS.SNP.SE.JunctionReadsOnly.byPair.unfiltered.txt SE
